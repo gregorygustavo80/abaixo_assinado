@@ -1,12 +1,15 @@
 from flask import Flask, request, jsonify, render_template
-import sqlite3
+import psycopg2
 import os
+
+def get_connection():
+    return psycopg2.connect(os.environ.get("DATABASE_URL"))
 
 app = Flask(__name__)
 
 @app.route("/")
 def index():
-    conn = sqlite3.connect("abaixo_assinado.db")
+    conn = get_connection()
     cursor = conn.cursor()
 
     # Busca as assinaturas
