@@ -2,10 +2,10 @@ from flask import Flask, request, jsonify, render_template
 import psycopg2
 import os
 
-app = Flask(__name__)
-
 def get_connection():
     return psycopg2.connect(os.environ.get("DATABASE_URL"))
+
+app = Flask(__name__)
 
 @app.route("/")
 def index():
@@ -30,9 +30,9 @@ def assinar():
     bairro = data.get("bairro")
     pet = data.get("pet")
 
-    conn = sqlite3.connect("abaixo_assinado.db")
+    conn = get_connection()  # Usando PostgreSQL em vez de SQLite
     cursor = conn.cursor()
-    cursor.execute("INSERT INTO assinaturas (nome, bairro, pet) VALUES (?, ?, ?)", (nome, bairro, pet))
+    cursor.execute("INSERT INTO assinaturas (nome, bairro, pet) VALUES (%s, %s, %s)", (nome, bairro, pet))
     conn.commit()
     conn.close()
 
@@ -44,14 +44,13 @@ def comentar():
     texto = data.get("comentario")
     autor = data.get("autor")
 
-    conn = sqlite3.connect("abaixo_assinado.db")
+    conn = get_connection()  # Usando PostgreSQL em vez de SQLite
     cursor = conn.cursor()
-    cursor.execute("INSERT INTO comentarios (texto, autor) VALUES (?, ?)", (texto, autor))
+    cursor.execute("INSERT INTO comentarios (texto, autor) VALUES (%s, %s)", (texto, autor))
     conn.commit()
     conn.close()
 
     return jsonify({"mensagem": "Comentário enviado com sucesso!"})
-
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))  # Usa a porta fornecida pelo Render
