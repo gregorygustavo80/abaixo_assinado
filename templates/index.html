@@ -8,7 +8,94 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
 </head>
 <body class="bg-gray-100 p-4">
-  <!-- ... (cabeçalho e conteúdo anterior permanecem igual) ... -->
+  <div class="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-lg">
+    <div class="flex flex-col md:flex-row justify-between items-start">
+      <div class="w-full md:w-2/3">
+        <h1 class="text-xl font-bold mb-2">🐶 Abaixo-Assinado: Mais Espaços Pet-Friendly na Nossa Cidade! 🐾</h1>
+        <p class="text-blue-600">Para: Prefeitura Municipal de Mossoró</p>
+        <p class="mt-4">Nós, moradores e jovens cidadãos de Mossoró, gostaríamos de sugerir a criação de mais espaços pet-friendly em nossa cidade...</p>
+        <p class="mt-4">Nossa proposta é simples e cheia de carinho: que nossos amigos de quatro patas também possam aproveitar a cidade com conforto e segurança.</p>
+        <ul class="list-disc list-inside mt-4">
+          <li>Instalação de bebedouros e lixeiras especiais para pets;</li>
+          <li>Criação de áreas cercadas para cachorros brincarem soltos com segurança;</li>
+          <li>Eventos comunitários que incentivem a adoção responsável;</li>
+          <li>Sinalização adequada para áreas pet-friendly.</li>
+        </ul>
+        <p class="mt-4">Cuidar dos animais e criar espaços para convivência entre pets e pessoas é uma forma de tornar a cidade mais amigável, inclusiva e saudável.</p>
+        <p class="mt-4">Se você também apoia essa ideia, assine e compartilhe com outras pessoas!</p>
+
+        <!-- Botão para mostrar a caixa de comentário -->
+        <button id="btn-mostrar-comentario" class="mt-4 bg-blue-600 text-white py-2 px-4 rounded">
+          Adicionar Comentário
+        </button>
+
+        <!-- Caixa de comentário com campo de nome -->
+        <div id="caixa-comentario" class="mt-4 hidden">
+          <label for="autor" class="block text-gray-700">Seu nome:</label>
+          <input id="autor" type="text" class="w-full border border-gray-300 rounded p-2 mt-2" placeholder="Digite seu nome..." />
+
+          <label for="comentario" class="block text-gray-700 mt-4">Comentário:</label>
+          <textarea id="comentario" class="w-full border border-gray-300 rounded p-2 mt-2" rows="4" placeholder="Digite seu comentário..."></textarea>
+
+          <button id="btn-comentario" class="mt-2 bg-green-600 text-white py-2 px-4 rounded">Enviar</button>
+        </div>
+
+        <!-- Formulário de assinatura -->
+        <div class="mt-4">
+          <label for="name" class="block text-gray-700">Nome:</label>
+          <input id="name" type="text" class="w-full border border-gray-300 rounded p-2 mt-2"/>
+          <label for="neighborhood" class="block text-gray-700 mt-4">Bairro:</label>
+          <input id="neighborhood" type="text" class="w-full border border-gray-300 rounded p-2 mt-2"/>
+          <label for="pet" class="block text-gray-700 mt-4">Você tem pet? Qual?</label>
+          <input id="pet" type="text" class="w-full border border-gray-300 rounded p-2 mt-2"/>
+          <button id="btn-assinar" class="mt-4 bg-blue-600 text-white py-2 px-4 rounded">Assinar abaixo-assinado</button>
+        </div>
+
+        <!-- Lista de Assinaturas -->
+        <div class="mt-10">
+          <h2 class="text-lg font-bold text-gray-700 mb-2">📋 Assinaturas recentes:</h2>
+          <ul class="list-disc list-inside bg-gray-50 p-4 rounded border">
+            {% for nome, bairro, pet in assinaturas %}
+              <li><strong>{{ nome }}</strong> ({{ bairro }}) — Pet: {{ pet }}</li>
+            {% else %}
+              <li>Nenhuma assinatura ainda.</li>
+            {% endfor %}
+          </ul>
+        </div>
+
+        <!-- Lista de Comentários -->
+        <div class="mt-10">
+          <h2 class="text-lg font-bold text-gray-700 mb-2">💬 Comentários enviados:</h2>
+          <ul class="list-disc list-inside bg-gray-50 p-4 rounded border">
+            {% for texto, autor in comentarios %}
+              <li><strong>{{ autor }}:</strong> {{ texto }}</li>
+            {% else %}
+              <li>Nenhum comentário ainda.</li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+
+      <!-- Coluna lateral -->
+      <div class="md:ml-6 mt-6 md:mt-0 w-full md:w-1/3 bg-orange-100 p-4 rounded-lg shadow-lg">
+        <div class="text-center">
+          <p class="text-2xl font-bold">{{ assinaturas|length }}</p>
+          <p class="text-sm">pessoas já assinaram</p>
+        </div>
+        <div class="mt-4 text-center">
+          <p class="text-sm">Criado por: Centro Educacional Alfa – Suyanne Gondim</p>
+          <a href="mailto:suyannecarvalho97@gmail.com" class="text-blue-600 text-sm block">Contate o autor</a>
+          <a href="tel:+558499172928" class="text-blue-600 text-sm block mt-1">Telefone: (84) 99172928</a>
+          <p class="text-sm"> Mossoró, 10 de abril de 2025 </p>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-4 text-xs text-gray-600">
+      <p>PETIÇÃO pública. <strong>🐶 Abaixo-Assinado: Mais Espaços Pet-Friendly na Nossa Cidade! 🐾</strong></p>
+    </div>
+  </div>
 
   <!-- JavaScript -->
   <script>
@@ -19,71 +106,33 @@
 
     // Enviar assinatura
     document.getElementById('btn-assinar').addEventListener('click', async () => {
-      const nome = document.getElementById('name').value.trim();
-      const bairro = document.getElementById('neighborhood').value.trim();
-      const pet = document.getElementById('pet').value.trim();
+      const nome = document.getElementById('name').value;
+      const bairro = document.getElementById('neighborhood').value;
+      const pet = document.getElementById('pet').value;
 
-      if (!nome || !bairro || !pet) {
-        alert("Por favor, preencha todos os campos!");
-        return;
-      }
+      await fetch('/assinar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nome, bairro, pet })
+      });
 
-      if (nome.length < 3 || bairro.length < 3 || pet.length < 2) {
-        alert("Por favor, preencha os campos corretamente!\nNome e bairro devem ter pelo menos 3 caracteres.\nO campo pet deve ter pelo menos 2 caracteres.");
-        return;
-      }
-
-      try {
-        const response = await fetch('/assinar', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ nome, bairro, pet })
-        });
-
-        const data = await response.json();
-        if (response.ok) {
-          alert(data.mensagem);
-          location.reload();
-        } else {
-          alert(data.erro || "Erro ao enviar assinatura");
-        }
-      } catch (error) {
-        alert("Erro ao conectar com o servidor");
-      }
+      alert("Assinatura enviada!");
+      location.reload();
     });
 
     // Enviar comentário
     document.getElementById('btn-comentario').addEventListener('click', async () => {
-      const autor = document.getElementById('autor').value.trim();
-      const comentario = document.getElementById('comentario').value.trim();
+      const autor = document.getElementById('autor').value;
+      const comentario = document.getElementById('comentario').value;
 
-      if (!autor || !comentario) {
-        alert("Por favor, preencha todos os campos!");
-        return;
-      }
+      await fetch('/comentario', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ autor, comentario })
+      });
 
-      if (autor.length < 3 || comentario.length < 10) {
-        alert("O nome deve ter pelo menos 3 caracteres e o comentário deve ter pelo menos 10 caracteres!");
-        return;
-      }
-
-      try {
-        const response = await fetch('/comentario', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ autor, comentario })
-        });
-
-        const data = await response.json();
-        if (response.ok) {
-          alert(data.mensagem);
-          location.reload();
-        } else {
-          alert(data.erro || "Erro ao enviar comentário");
-        }
-      } catch (error) {
-        alert("Erro ao conectar com o servidor");
-      }
+      alert("Comentário enviado!");
+      location.reload();
     });
   </script>
 </body>
