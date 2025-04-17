@@ -1,27 +1,57 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, request, jsonify, render_template
+import psycopg2
 import os
 
+def get_connection():
+    return psycopg2.connect(os.environ.get("DATABASE_URL"))
+
 app = Flask(__name__)
-app.secret_key = 'sua_chave_secreta_aqui'  # Necessário para usar flash()
 
-@app.route('/')
+@app.route("/")
 def index():
-    return render_template('index.html')
+    conn = get_connection()
+    cursor = conn.cursor()
 
-@app.route('/assinar', methods=['POST'])
+    # Busca as assinaturas
+    cursor.execute("SELECT nome, bairro, pet FROM assinaturas")
+    assinaturas = cursor.fetchall()
+
+    # Busca os comentários com autor
+    cursor.execute("SELECT texto, autor FROM comentarios")
+    comentarios = cursor.fetchall()
+
+    conn.close()
+    return render_template("index.html", assinaturas=assinaturas, comentarios=comentarios)
+
+@app.route("/assinar", methods=["POST"])
 def assinar():
-    nome = request.form['nome']
-    comentario = request.form['comentario']
-    
-    # Verificar se o comentário está vazio
-    if not comentario.strip():
-        flash("O campo de comentário não pode estar em branco.", "error")
-        return redirect(url_for('index'))  # Redireciona de volta para a página inicial
-    
-    # Simulação de sucesso
-    flash("Assinatura registrada com sucesso!", "success")
-    return redirect(url_for('index'))  # Redireciona após salvar a assinatura
+    data = request.json
+    nome = data.get("nome")
+    bairro = data.get("bairro")
+    pet = data.get("pet")
 
-if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 5000))
+    conn = get_connection()  # Usando PostgreSQL em vez de SQLite
+    cursor = conn.cursor()
+    cursor.execute("INSERT INTO assinaturas (nome, bairro, pet) VALUES (%s, %s, %s)", (nome, bairro, pet))
+    conn.commit()
+    conn.close()
+
+    return jsonify({"mensagem": "Assinatura registrada com sucesso!"})
+
+@app.route("/comentario", methods=["POST"])
+def comentar():
+    data = request.json
+    texto = data.get("comentario")
+    autor = data.get("autor")
+
+    conn = get_connection()  # Usando PostgreSQL em vez de SQLite
+    cursor = conn.cursor()
+    cursor.execute("INSERT INTO comentarios (texto, autor) VALUES (%s, %s)", (texto, autor))
+    conn.commit()
+    conn.close()
+
+    return jsonify({"mensagem": "Comentário enviado com sucesso!"})
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 5000))  # Usa a porta fornecida pelo Render
     app.run(debug=True, host="0.0.0.0", port=port)
