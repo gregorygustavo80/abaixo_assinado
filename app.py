@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
-
+import os
 app = Flask(__name__)
 app.secret_key = 'sua_chave_secreta_aqui'  # Necessário para usar flash()
 
